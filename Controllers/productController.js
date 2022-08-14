@@ -1,87 +1,107 @@
 const Product = require('../Models/productModel');
+
+
 exports.getAllProducts = async (req, res, next) => {
     try {
-        Product.sync();
-        const products = await Product.findAll();
+        const products = await Product.find();
         res.status(200).json({
-            message: 'All products fetched successfully',
-            products: products
+            status: 'success',
+            results: products.length,
+            data: {
+                products
+            }
         });
-    } catch (err) {
+    } catch (error) {
         res.status(500).json({
-            message: 'Failed to fetch products',
-            error: err
+            status: 'error',
+            message: 'Server Error'
         });
     }
 }
+
 exports.createProduct = async (req, res, next) => {
-    console.log(req.file);
-    console.log(req.body);
     try {
-        Product.sync();
         const product = await Product.create(req.body);
         res.status(201).json({
-            message: 'Product created successfully',
-            product: product
+            status: 'success',
+            data: {
+                product
+            }
         });
-    } catch (err) {
+    } catch (error) {
         res.status(500).json({
-            message: 'Failed to create product',
-            error: err
+            status: 'error',
+            message: 'Server Error'
         });
     }
 }
 
 exports.getProduct = async (req, res, next) => {
     try {
-        Product.sync();
-        const product = await Product.findByPk(req.params.id);
+        const product = await Product.find().where('_id').equals(req.params.id);
+        if (!product) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Product not found'
+            });
+        }
         res.status(200).json({
-            message: 'Product fetched successfully',
-            product: product
+            status: 'success',
+            data: {
+                product
+            }
         });
-    } catch (err) {
+    } catch (error) {
         res.status(500).json({
-            message: 'Failed to fetch product',
-            error: err
+            status: 'error',
+            message: 'Server Error'
         });
     }
 }
+
 exports.updateProduct = async (req, res, next) => {
     try {
-        Product.sync();
-        const product = await Product.update(req.body, {
-            where: {
-                id: req.params.id
+        const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+        if (!product) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Product not found'
+            });
+        }
+        res.status(200).json({
+            status: 'success',
+            data: {
+                product
             }
         });
-        res.status(200).json({
-            message: 'Product updated successfully',
-            product: product
-        });
-    } catch (err) {
+    } catch (error) {
         res.status(500).json({
-            message: 'Failed to update product',
-            error: err
+            status: 'error',
+            message: 'Server Error'
         });
     }
 }
+
 exports.deleteProduct = async (req, res, next) => {
     try {
-        Product.sync();
-        const product = await Product.destroy({
-            where: {
-                id: req.params.id
-            }
+        const product = await Product.findByIdAndDelete(req.params.id);
+        if (!product) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Product not found'
+            });
+        }
+        res.status(204).json({
+            status: 'success',
+            data: null
         });
-        res.status(200).json({
-            message: 'Product deleted successfully',
-            product: product
-        });
-    } catch (err) {
+    } catch (error) {
         res.status(500).json({
-            message: 'Failed to delete product',
-            error: err
+            status: 'error',
+            message: 'Server Error'
         });
     }
 }
