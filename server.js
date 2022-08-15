@@ -1,29 +1,21 @@
 const app = require('./app');
-const mongoose = require('mongoose');
+const client = require('./config/mongoDb');
+const connect = require('./config/mongooseDb');
 const dotenv = require('dotenv');
-process.on('uncaughtException', err => {
-    console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
-    console.log(err.name, err.message);
-    process.exit(1);
-});
 
 dotenv.config({ path: './.env' });
-mongoose
-    .connect(process.env.DATABASE_LOCAL, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-    .then(() => console.log('DB connection successful!'));
-
+// Native MongoDB driver
+(async () => {
+    try {
+        await client.connect();
+        console.log("DB connection successful!");
+    } catch (error) {
+        console.log(error);
+    }
+})();
+// Mongoose ORM
+connect();
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 })
-
-process.on('unhandledRejection', err => {
-    console.log('UNHANDLED REJECTION! 💥 Shutting down...');
-    console.log(err.name, err.message);
-    server.close(() => {
-        process.exit(1);
-    });
-});
