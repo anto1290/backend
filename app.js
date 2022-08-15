@@ -14,7 +14,7 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // Cors Middleware
-const allowlist = ['http://localhost:3005', 'http://localhost:5000'];
+const allowlist = ['http://localhost:3005', 'http://localhost:5000', 'https://frontend-temp.herokuapp.com/'];
 const corsOptions = {
     origin: (origin, callback) => {
         if (allowlist.includes(origin)) {
